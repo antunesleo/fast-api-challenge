@@ -93,6 +93,6 @@ Feel free to use the patterns and code architecture you believe is ideal for a p
 
 The solution must be covered with automated tests
 
-### Running
+### [optional] Running
 
 everything must be run inside a docker container
