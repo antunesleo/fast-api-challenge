@@ -30,6 +30,7 @@ def create_place(place: PlaceCreate, session: Session = Depends(get_session)):
 @app.get("/places", response_model=list[PlaceRead])
 def list_places(
     offset: int = 0,
+    name: str | None = None,
     latitude: Annotated[float | None, Query(ge=-90, le=90)] = None,
     longitude: Annotated[float | None, Query(ge=-180, le=180)] = None,
     radius: Annotated[float | None, Query(ge=0)] = None,
@@ -46,6 +47,9 @@ def list_places(
             )
 
         statement = statement.where(Place.within_clause(latitude, longitude, radius))
+
+    if name is not None:
+        statement = statement.where(Place.name.ilike(f"%{name}%"))
 
     db_places = session.exec(statement)
     return db_places
