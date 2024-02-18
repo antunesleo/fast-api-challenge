@@ -17,6 +17,7 @@ httptools==0.6.1
     # via uvicorn
 idna==3.6
     # via anyio
+psycopg2-binary==2.9.9
 pydantic==2.6.1
     # via
     #   fastapi
