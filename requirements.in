@@ -2,3 +2,4 @@ fastapi~=0.109.2
 sqlmodel~=0.0.16
 uvicorn[standard]~=0.27.1
 psycopg2-binary~=2.9.9
+geoalchemy2[shapely]~=0.14.4

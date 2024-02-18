@@ -1,3 +1,5 @@
+from geoalchemy2.elements import WKBElement, WKTElement
+from geoalchemy2.shape import to_shape
 from pydantic import BaseModel, field_serializer, field_validator
 
 
@@ -18,12 +20,12 @@ class PlaceCreate(PlaceBase):
 
     @field_serializer("location")
     def serialize_location(location: Location):
-        return f"{location.latitude},{location.longitude}"
+        return WKTElement(f"POINT({location.longitude} {location.latitude})")
 
 
 class PlaceRead(PlaceBase):
     @field_validator("location", mode="before")
     @classmethod
-    def validate_location(cls, location: str) -> Location:
-        lat, lng = location.split(",")
-        return Location(latitude=float(lat), longitude=float(lng))
+    def validate_location(cls, location: WKBElement) -> Location:
+        point = to_shape(location)
+        return Location(longitude=point.x, latitude=point.y)
