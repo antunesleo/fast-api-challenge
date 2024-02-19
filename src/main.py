@@ -1,9 +1,11 @@
 from contextlib import asynccontextmanager
 from typing import Annotated
 
-from fastapi import Depends, FastAPI, HTTPException, Query, status
+from fastapi import Depends, FastAPI, HTTPException, Query, Security, status
+from fastapi.security import APIKeyHeader
 from sqlmodel import Session, select
 
+import settings
 from db import get_session, init_db
 from models import Place
 from serializers import PlaceCreate, PlaceRead
@@ -17,9 +19,22 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+header_scheme = APIKeyHeader(name="API-KEY")
 
-@app.post("/places", response_model=PlaceRead)
-def create_place(place: PlaceCreate, session: Session = Depends(get_session)):
+
+def verify_api_key(api_key: str = Security(header_scheme)):
+    if api_key != settings.API_KEY:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid API Key",
+        )
+
+
+@app.post("/places", response_model=PlaceRead, dependencies=[Security(verify_api_key)])
+def create_place(
+    place: PlaceCreate,
+    session: Session = Depends(get_session),
+):
     db_place = Place.model_validate(place.model_dump(by_alias=True))
     session.add(db_place)
     session.commit()
@@ -27,7 +42,11 @@ def create_place(place: PlaceCreate, session: Session = Depends(get_session)):
     return db_place
 
 
-@app.get("/places", response_model=list[PlaceRead])
+@app.get(
+    "/places",
+    response_model=list[PlaceRead],
+    dependencies=[Security(verify_api_key)],
+)
 def list_places(
     offset: int = 0,
     name: str | None = None,
@@ -49,7 +68,7 @@ def list_places(
         statement = statement.where(Place.within_clause(latitude, longitude, radius))
 
     if name is not None:
-        statement = statement.where(Place.name.ilike(f"%{name}%"))
+        statement = statement.where(Place.name.ilike("%{name}%"))
 
     db_places = session.exec(statement)
     return db_places
