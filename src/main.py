@@ -30,7 +30,12 @@ def verify_api_key(api_key: str = Security(header_scheme)):
         )
 
 
-@app.post("/places", response_model=PlaceRead, dependencies=[Security(verify_api_key)])
+@app.post(
+    "/places",
+    response_model=PlaceRead,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Security(verify_api_key)],
+)
 def create_place(
     place: PlaceCreate,
     session: Session = Depends(get_session),
