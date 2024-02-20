@@ -3,3 +3,5 @@
 
 pdbpp
 ipython
+pytest
+httpx
