@@ -1,0 +1,7 @@
+-r requirements.txt
+-c requirements.txt
+
+pdbpp
+ipython
+pytest
+httpx
