@@ -22,6 +22,7 @@ services:
       - POSTGRES_DB=fastapi_challenge
     volumes:
       - postgresql_data:/var/lib/postgresql/data
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
 
 volumes:
   postgresql_data:

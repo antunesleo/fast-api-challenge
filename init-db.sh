@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+
+POSTGRES_TEST_DB=$POSTGRES_DB"_test"
+
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
+	CREATE DATABASE $POSTGRES_TEST_DB;
+    \c  $POSTGRES_TEST_DB
+    CREATE EXTENSION postgis;
+EOSQL
