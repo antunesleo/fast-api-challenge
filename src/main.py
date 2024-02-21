@@ -73,7 +73,7 @@ def list_places(
         statement = statement.where(Place.within_clause(latitude, longitude, radius))
 
     if name is not None:
-        statement = statement.where(Place.name.ilike("%{name}%"))
+        statement = statement.where(Place.name.icontains(name))
 
     db_places = session.exec(statement)
     return db_places
